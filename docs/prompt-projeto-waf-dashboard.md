@@ -85,7 +85,7 @@ Criar `docker-compose.yml` na raiz do repositório:
 
 - Grafana 9.5.20 na porta 3000
 - Plugin `frser-sqlite-datasource` instalado via variável de ambiente `GF_INSTALL_PLUGINS`
-- Credenciais: admin / Manole@WAF2026
+- Credenciais: admin / (definir via variável de ambiente `GF_SECURITY_ADMIN_PASSWORD` ou arquivo `.env`)
 - Volumes mapeando:
   - `./grafana/provisioning` → `/etc/grafana/provisioning`
   - `./grafana/dashboards` → `/var/lib/grafana/dashboards`
@@ -162,7 +162,7 @@ Criar `atualizar.sh` na raiz:
 #!/bin/bash
 echo "=== Atualizando dados WAF Manole ==="
 echo "[1/2] Ingerindo dados..."
-cd /root/waf-dashboard
+cd "$(dirname "$0")"
 python3 scripts/ingest_data.py
 echo "[2/2] Verificando Grafana..."
 docker ps | grep grafana-waf || docker-compose up -d
