@@ -1,0 +1,319 @@
+{  
+  "id": null,  
+  "uid": "waf-manole-main",  
+  "title": "WAF Manole - Indicadores de Protecao",  
+  "tags": ["waf", "seguranca", "manole"],  
+  "timezone": "browser",  
+  "refresh": "",  
+  "schemaVersion": 38,  
+  "editable": true,  
+  "panels": [  
+    {  
+      "id": 1,  
+      "title": "Inventario de Sites Protegidos",  
+      "description": "Lista de todos os sites atualmente protegidos pelo AWS WAF",  
+      "type": "table",  
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 0 },  
+      "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
+      "targets": [  
+        {  
+          "rawSql": "SELECT DISTINCT site AS 'Site', web_acl AS 'Web ACL', recurso_tipo AS 'Tipo Recurso', regiao AS 'Regiao', data_coleta AS 'Ultima Coleta' FROM inventario_sites ORDER BY site",  
+          "refId": "A",  
+          "format": "table"  
+        }  
+      ],  
+      "fieldConfig": {  
+        "defaults": {  
+          "custom": {  
+            "align": "left",  
+            "cellOptions": { "type": "auto" },  
+            "filterable": true  
+          }  
+        },  
+        "overrides": []  
+      }  
+    },  
+    {  
+      "id": 2,  
+      "title": "Regras por Modo: Bloqueio vs Monitor",  
+      "description": "Detalhamento de cada regra WAF e seu modo de operacao (Block ou Count)",  
+      "type": "table",  
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 6 },  
+      "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
+      "targets": [  
+        {  
+          "rawSql": "SELECT site AS 'Site', web_acl AS 'Web ACL', regra AS 'Regra', tipo_regra AS 'Tipo', CASE WHEN UPPER(acao) = 'BLOCK' THEN 'BLOQUEIO' WHEN UPPER(acao) = 'COUNT' THEN 'MONITOR' ELSE acao END AS 'Modo' FROM inventario_sites ORDER BY site, acao",  
+          "refId": "A",  
+          "format": "table"  
+        }  
+      ],  
+      "fieldConfig": {  
+        "defaults": {  
+          "custom": {  
+            "align": "left",  
+            "cellOptions": { "type": "auto" },  
+            "filterable": true  
+          }  
+        },  
+        "overrides": [  
+          {  
+            "matcher": { "id": "byName", "options": "Modo" },  
+            "properties": [  
+              {  
+                "id": "custom.cellOptions",  
+                "value": { "type": "color-text" }  
+              },  
+              {  
+                "id": "mappings",  
+                "value": [  
+                  {  
+                    "type": "value",  
+                    "options": {  
+                      "BLOQUEIO": { "text": "BLOQUEIO", "color": "green" },  
+                      "MONITOR": { "text": "MONITOR", "color": "yellow" }  
+                    }  
+                  }  
+                ]  
+              }  
+            ]  
+          }  
+        ]  
+      }  
+    },  
+    {  
+      "id": 3,  
+      "title": "Resumo: Regras em Bloqueio vs Monitor",  
+      "description": "Proporcao de regras em modo Block versus Count",  
+      "type": "piechart",  
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 16 },  
+      "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
+      "targets": [  
+        {  
+          "rawSql": "SELECT CASE WHEN UPPER(acao) = 'BLOCK' THEN 'Bloqueio' ELSE 'Monitor' END AS modo, COUNT(*) AS total FROM inventario_sites GROUP BY modo",  
+          "refId": "A",  
+          "format": "table"  
+        }  
+      ],  
+      "options": {  
+        "legend": {  
+          "displayMode": "table",  
+          "placement": "right",  
+          "values": ["value", "percent"]  
+        },  
+        "pieType": "pie",  
+        "reduceOptions": {  
+          "calcs": ["lastNotNull"],  
+          "fields": "",  
+          "values": true  
+        },  
+        "tooltip": { "mode": "single" }  
+      },  
+      "fieldConfig": {  
+        "overrides": [  
+          {  
+            "matcher": { "id": "byName", "options": "Bloqueio" },  
+            "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]  
+          },  
+          {  
+            "matcher": { "id": "byName", "options": "Monitor" },  
+            "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }]  
+          }  
+        ]  
+      }  
+    },  
+    {  
+      "id": 4,  
+      "title": "Cobertura de Protecao por Site (% regras em bloqueio)",  
+      "description": "Percentual de regras em modo Block por site. Meta: acima de 80%",  
+      "type": "gauge",  
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 16 },  
+      "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
+      "targets": [  
+        {  
+          "rawSql": "SELECT site AS 'Site', ROUND(100.0 * SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) / COUNT(*), 1) AS 'Cobertura' FROM inventario_sites GROUP BY site",  
+          "refId": "A",  
+          "format": "table"  
+        }  
+      ],  
+      "fieldConfig": {  
+        "defaults": {  
+          "min": 0,  
+          "max": 100,  
+          "unit": "percent",  
+          "thresholds": {  
+            "mode": "absolute",  
+            "steps": [  
+              { "value": null, "color": "red" },  
+              { "value": 50, "color": "yellow" },  
+              { "value": 80, "color": "green" }  
+            ]  
+          }  
+        }  
+      },  
+      "options": {  
+        "reduceOptions": {  
+          "calcs": ["lastNotNull"],  
+          "fields": "/^Cobertura$/",  
+          "values": true  
+        },  
+        "showThresholdLabels": false,  
+        "showThresholdMarkers": true  
+      }  
+    },  
+    {  
+      "id": 5,  
+      "title": "Requests Bloqueados vs Monitorados (por dia)",  
+      "description": "Evolucao diaria de requests bloqueados e monitorados pelo WAF",  
+      "type": "barchart",  
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 26 },  
+      "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
+      "targets": [  
+        {  
+          "rawSql": "SELECT data AS 'Data', total_blocked AS 'Bloqueados', total_counted AS 'Monitorados' FROM resumo_diario ORDER BY data",  
+          "refId": "A",  
+          "format": "table"  
+        }  
+      ],  
+      "fieldConfig": {  
+        "defaults": {},  
+        "overrides": [  
+          {  
+            "matcher": { "id": "byName", "options": "Bloqueados" },  
+            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]  
+          },  
+          {  
+            "matcher": { "id": "byName", "options": "Monitorados" },  
+            "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }]  
+          }  
+        ]  
+      },  
+      "options": {  
+        "barWidth": 0.8,  
+        "groupWidth": 0.7,  
+        "legend": { "displayMode": "list", "placement": "bottom" },  
+        "orientation": "auto",  
+        "showValue": "auto",  
+        "stacking": "none",  
+        "tooltip": { "mode": "single" },  
+        "xTickLabelRotation": -45  
+      }  
+    },  
+    {  
+      "id": 6,  
+      "title": "Top 10 IPs Bloqueados",  
+      "description": "Enderecos IP com maior numero de bloqueios pelo WAF",  
+      "type": "table",  
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 36 },  
+      "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
+      "targets": [  
+        {  
+          "rawSql": "SELECT source_ip AS 'IP', country AS 'Pais', COUNT(*) AS 'Total Bloqueios' FROM waf_logs WHERE UPPER(acao) = 'BLOCK' GROUP BY source_ip, country ORDER BY COUNT(*) DESC LIMIT 10",  
+          "refId": "A",  
+          "format": "table"  
+        }  
+      ],  
+      "fieldConfig": {  
+        "defaults": {  
+          "custom": {  
+            "align": "left",  
+            "cellOptions": { "type": "auto" },  
+            "filterable": true  
+          }  
+        }  
+      }  
+    },  
+    {  
+      "id": 7,  
+      "title": "Top 10 URIs Atacadas",  
+      "description": "Endpoints mais visados por ataques, com contagem de bloqueios e monitoramentos",  
+      "type": "table",  
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 36 },  
+      "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
+      "targets": [  
+        {  
+          "rawSql": "SELECT uri AS 'URI', COUNT(*) AS 'Total Ataques', SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) AS 'Bloqueados', SUM(CASE WHEN UPPER(acao) = 'COUNT' THEN 1 ELSE 0 END) AS 'Monitorados' FROM waf_logs GROUP BY uri ORDER BY COUNT(*) DESC LIMIT 10",  
+          "refId": "A",  
+          "format": "table"  
+        }  
+      ],  
+      "fieldConfig": {  
+        "defaults": {  
+          "custom": {  
+            "align": "left",  
+            "cellOptions": { "type": "auto" },  
+            "filterable": true  
+          }  
+        }  
+      }  
+    },  
+    {  
+      "id": 8,  
+      "title": "Ataques por Pais de Origem",  
+      "description": "Distribuicao geografica dos ataques bloqueados pelo WAF",  
+      "type": "piechart",  
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 44 },  
+      "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
+      "targets": [  
+        {  
+          "rawSql": "SELECT country AS 'Pais', COUNT(*) AS 'Total' FROM waf_logs WHERE UPPER(acao) = 'BLOCK' GROUP BY country ORDER BY COUNT(*) DESC LIMIT 15",  
+          "refId": "A",  
+          "format": "table"  
+        }  
+      ],  
+      "options": {  
+        "legend": {  
+          "displayMode": "table",  
+          "placement": "right",  
+          "values": ["value", "percent"]  
+        },  
+        "pieType": "pie",  
+        "reduceOptions": {  
+          "calcs": ["lastNotNull"],  
+          "fields": "",  
+          "values": true  
+        },  
+        "tooltip": { "mode": "single" }  
+      }  
+    },  
+    {  
+      "id": 9,  
+      "title": "Regras Mais Acionadas",  
+      "description": "Quais regras do WAF estao sendo mais ativadas (bloqueios e monitoramentos)",  
+      "type": "barchart",  
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 44 },  
+      "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
+      "targets": [  
+        {  
+          "rawSql": "SELECT regra AS 'Regra', SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) AS 'Bloqueios', SUM(CASE WHEN UPPER(acao) = 'COUNT' THEN 1 ELSE 0 END) AS 'Monitoramentos' FROM waf_logs GROUP BY regra ORDER BY COUNT(*) DESC",  
+          "refId": "A",  
+          "format": "table"  
+        }  
+      ],  
+      "fieldConfig": {  
+        "defaults": {},  
+        "overrides": [  
+          {  
+            "matcher": { "id": "byName", "options": "Bloqueios" },  
+            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]  
+          },  
+          {  
+            "matcher": { "id": "byName", "options": "Monitoramentos" },  
+            "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }]  
+          }  
+        ]  
+      },  
+      "options": {  
+        "barWidth": 0.8,  
+        "groupWidth": 0.7,  
+        "legend": { "displayMode": "list", "placement": "bottom" },  
+        "orientation": "horizontal",  
+        "showValue": "auto",  
+        "stacking": "none",  
+        "tooltip": { "mode": "single" },  
+        "xTickLabelRotation": 0  
+      }  
+    }  
+  ],  
+  "time": { "from": "now-30d", "to": "now" },  
+  "version": 1  
+}
