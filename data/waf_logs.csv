@@ -1,0 +1,4 @@
+timestamp,web_acl,regra,acao,source_ip,uri,country,http_method,status_code
+2026-03-28T10:15:00Z,ACL-Manole-Prod,AWS-AWSManagedRulesCommonRuleSet,BLOCK,203.0.113.50,/admin,CN,GET,403
+2026-03-28T10:16:00Z,ACL-Manole-Prod,AWS-AWSManagedRulesSQLiRuleSet,COUNT,198.51.100.23,/search?q=1' OR 1=1,US,GET,200
+2026-03-28T10:17:00Z,ACL-Manole-Loja,RateLimitRule,BLOCK,192.0.2.100,/api/login,BR,POST,403

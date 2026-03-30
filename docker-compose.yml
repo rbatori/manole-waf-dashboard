@@ -1,0 +1,21 @@
+version: '3'  
+  
+services:  
+  grafana:  
+    image: grafana/grafana:9.5.20  
+    container_name: grafana-waf  
+    ports:  
+      - "3000:3000"  
+    environment:  
+      - GF_SECURITY_ADMIN_USER=admin  
+      - GF_SECURITY_ADMIN_PASSWORD=Manole@WAF2026  
+      - GF_INSTALL_PLUGINS=frser-sqlite-datasource  
+    volumes:  
+      - ./grafana/provisioning:/etc/grafana/provisioning  
+      - ./grafana/dashboards:/var/lib/grafana/dashboards  
+      - ./data:/var/lib/grafana/data-waf  
+      - grafana-storage:/var/lib/grafana  
+    restart: unless-stopped  
+  
+volumes:  
+  grafana-storage:
