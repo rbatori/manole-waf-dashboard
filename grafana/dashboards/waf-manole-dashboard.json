@@ -17,9 +17,11 @@
       "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
       "targets": [  
         {  
-          "rawSql": "SELECT DISTINCT site AS 'Site', web_acl AS 'Web ACL', recurso_tipo AS 'Tipo Recurso', regiao AS 'Regiao', data_coleta AS 'Ultima Coleta' FROM inventario_sites ORDER BY site",  
+          "rawQueryText": "SELECT DISTINCT site AS 'Site', web_acl AS 'Web ACL', recurso_tipo AS 'Tipo Recurso', regiao AS 'Regiao', data_coleta AS 'Ultima Coleta' FROM inventario_sites ORDER BY site",  
+          "queryText": "SELECT DISTINCT site AS 'Site', web_acl AS 'Web ACL', recurso_tipo AS 'Tipo Recurso', regiao AS 'Regiao', data_coleta AS 'Ultima Coleta' FROM inventario_sites ORDER BY site",  
           "refId": "A",  
-          "format": "table"  
+          "queryType": "table",  
+          "timeColumns": ["time", "ts"]  
         }  
       ],  
       "fieldConfig": {  
@@ -42,9 +44,11 @@
       "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
       "targets": [  
         {  
-          "rawSql": "SELECT site AS 'Site', web_acl AS 'Web ACL', regra AS 'Regra', tipo_regra AS 'Tipo', CASE WHEN UPPER(acao) = 'BLOCK' THEN 'BLOQUEIO' WHEN UPPER(acao) = 'COUNT' THEN 'MONITOR' ELSE acao END AS 'Modo' FROM inventario_sites ORDER BY site, acao",  
+          "rawQueryText": "SELECT site AS 'Site', web_acl AS 'Web ACL', regra AS 'Regra', tipo_regra AS 'Tipo', CASE WHEN UPPER(acao) = 'BLOCK' THEN 'BLOQUEIO' WHEN UPPER(acao) = 'COUNT' THEN 'MONITOR' ELSE acao END AS 'Modo' FROM inventario_sites ORDER BY site, acao",  
+          "queryText": "SELECT site AS 'Site', web_acl AS 'Web ACL', regra AS 'Regra', tipo_regra AS 'Tipo', CASE WHEN UPPER(acao) = 'BLOCK' THEN 'BLOQUEIO' WHEN UPPER(acao) = 'COUNT' THEN 'MONITOR' ELSE acao END AS 'Modo' FROM inventario_sites ORDER BY site, acao",  
           "refId": "A",  
-          "format": "table"  
+          "queryType": "table",  
+          "timeColumns": ["time", "ts"]  
         }  
       ],  
       "fieldConfig": {  
@@ -89,9 +93,11 @@
       "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
       "targets": [  
         {  
-          "rawSql": "SELECT CASE WHEN UPPER(acao) = 'BLOCK' THEN 'Bloqueio' ELSE 'Monitor' END AS modo, COUNT(*) AS total FROM inventario_sites GROUP BY modo",  
+          "rawQueryText": "SELECT CASE WHEN UPPER(acao) = 'BLOCK' THEN 'Bloqueio' ELSE 'Monitor' END AS modo, COUNT(*) AS total FROM inventario_sites GROUP BY modo",  
+          "queryText": "SELECT CASE WHEN UPPER(acao) = 'BLOCK' THEN 'Bloqueio' ELSE 'Monitor' END AS modo, COUNT(*) AS total FROM inventario_sites GROUP BY modo",  
           "refId": "A",  
-          "format": "table"  
+          "queryType": "table",  
+          "timeColumns": ["time", "ts"]  
         }  
       ],  
       "options": {  
@@ -130,9 +136,11 @@
       "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
       "targets": [  
         {  
-          "rawSql": "SELECT site AS 'Site', ROUND(100.0 * SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) / COUNT(*), 1) AS 'Cobertura' FROM inventario_sites GROUP BY site",  
+          "rawQueryText": "SELECT site AS 'Site', ROUND(100.0 * SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) / COUNT(*), 1) AS 'Cobertura' FROM inventario_sites GROUP BY site",  
+          "queryText": "SELECT site AS 'Site', ROUND(100.0 * SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) / COUNT(*), 1) AS 'Cobertura' FROM inventario_sites GROUP BY site",  
           "refId": "A",  
-          "format": "table"  
+          "queryType": "table",  
+          "timeColumns": ["time", "ts"]  
         }  
       ],  
       "fieldConfig": {  
@@ -169,9 +177,11 @@
       "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
       "targets": [  
         {  
-          "rawSql": "SELECT data AS 'Data', total_blocked AS 'Bloqueados', total_counted AS 'Monitorados' FROM resumo_diario ORDER BY data",  
+          "rawQueryText": "SELECT data AS 'Data', total_blocked AS 'Bloqueados', total_counted AS 'Monitorados' FROM resumo_diario ORDER BY data",  
+          "queryText": "SELECT data AS 'Data', total_blocked AS 'Bloqueados', total_counted AS 'Monitorados' FROM resumo_diario ORDER BY data",  
           "refId": "A",  
-          "format": "table"  
+          "queryType": "table",  
+          "timeColumns": ["time", "ts"]  
         }  
       ],  
       "fieldConfig": {  
@@ -207,9 +217,11 @@
       "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
       "targets": [  
         {  
-          "rawSql": "SELECT source_ip AS 'IP', country AS 'Pais', COUNT(*) AS 'Total Bloqueios' FROM waf_logs WHERE UPPER(acao) = 'BLOCK' GROUP BY source_ip, country ORDER BY COUNT(*) DESC LIMIT 10",  
+          "rawQueryText": "SELECT source_ip AS 'IP', country AS 'Pais', COUNT(*) AS 'Total Bloqueios' FROM waf_logs WHERE UPPER(acao) = 'BLOCK' and source_ip != '' GROUP BY source_ip, country ORDER BY COUNT(*) DESC LIMIT 10",  
+          "queryText": "SELECT source_ip AS 'IP', country AS 'Pais', COUNT(*) AS 'Total Bloqueios' FROM waf_logs WHERE UPPER(acao) = 'BLOCK' and source_ip != '' GROUP BY source_ip, country ORDER BY COUNT(*) DESC LIMIT 10",  
           "refId": "A",  
-          "format": "table"  
+          "queryType": "table",  
+          "timeColumns": ["time", "ts"]  
         }  
       ],  
       "fieldConfig": {  
@@ -231,9 +243,11 @@
       "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
       "targets": [  
         {  
-          "rawSql": "SELECT uri AS 'URI', COUNT(*) AS 'Total Ataques', SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) AS 'Bloqueados', SUM(CASE WHEN UPPER(acao) = 'COUNT' THEN 1 ELSE 0 END) AS 'Monitorados' FROM waf_logs GROUP BY uri ORDER BY COUNT(*) DESC LIMIT 10",  
+          "rawQueryText": "SELECT uri AS 'URI', COUNT(*) AS 'Total Ataques', SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) AS 'Bloqueados', SUM(CASE WHEN UPPER(acao) = 'COUNT' THEN 1 ELSE 0 END) AS 'Monitorados' FROM waf_logs GROUP BY uri ORDER BY COUNT(*) DESC LIMIT 10",  
+          "queryText": "SELECT uri AS 'URI', COUNT(*) AS 'Total Ataques', SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) AS 'Bloqueados', SUM(CASE WHEN UPPER(acao) = 'COUNT' THEN 1 ELSE 0 END) AS 'Monitorados' FROM waf_logs GROUP BY uri ORDER BY COUNT(*) DESC LIMIT 10",  
           "refId": "A",  
-          "format": "table"  
+          "queryType": "table",  
+          "timeColumns": ["time", "ts"]  
         }  
       ],  
       "fieldConfig": {  
@@ -255,9 +269,11 @@
       "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
       "targets": [  
         {  
-          "rawSql": "SELECT country AS 'Pais', COUNT(*) AS 'Total' FROM waf_logs WHERE UPPER(acao) = 'BLOCK' GROUP BY country ORDER BY COUNT(*) DESC LIMIT 15",  
+          "rawQueryText": "SELECT country AS 'Pais', COUNT(*) AS 'Total' FROM waf_logs WHERE UPPER(acao) = 'BLOCK' and country != '' GROUP BY country ORDER BY COUNT(*) DESC LIMIT 15",  
+          "queryText": "SELECT country AS 'Pais', COUNT(*) AS 'Total' FROM waf_logs WHERE UPPER(acao) = 'BLOCK' and country != '' GROUP BY country ORDER BY COUNT(*) DESC LIMIT 15",  
           "refId": "A",  
-          "format": "table"  
+          "queryType": "table",  
+          "timeColumns": ["time", "ts"]  
         }  
       ],  
       "options": {  
@@ -284,9 +300,11 @@
       "datasource": { "type": "frser-sqlite-datasource", "uid": "WAF-SQLite" },  
       "targets": [  
         {  
-          "rawSql": "SELECT regra AS 'Regra', SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) AS 'Bloqueios', SUM(CASE WHEN UPPER(acao) = 'COUNT' THEN 1 ELSE 0 END) AS 'Monitoramentos' FROM waf_logs GROUP BY regra ORDER BY COUNT(*) DESC",  
+          "rawQueryText": "SELECT regra AS 'Regra', SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) AS 'Bloqueios', SUM(CASE WHEN UPPER(acao) = 'COUNT' THEN 1 ELSE 0 END) AS 'Monitoramentos' FROM waf_logs GROUP BY regra ORDER BY COUNT(*) DESC",  
+          "queryText": "SELECT regra AS 'Regra', SUM(CASE WHEN UPPER(acao) = 'BLOCK' THEN 1 ELSE 0 END) AS 'Bloqueios', SUM(CASE WHEN UPPER(acao) = 'COUNT' THEN 1 ELSE 0 END) AS 'Monitoramentos' FROM waf_logs GROUP BY regra ORDER BY COUNT(*) DESC",  
           "refId": "A",  
-          "format": "table"  
+          "queryType": "table",  
+          "timeColumns": ["time", "ts"]  
         }  
       ],  
       "fieldConfig": {  
