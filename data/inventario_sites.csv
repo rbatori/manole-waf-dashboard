@@ -1,6 +1,13 @@
 web_acl,site,recurso_tipo,regiao,regra,tipo_regra,acao
-ACL-Manole-Prod,www.manole.com.br,CloudFront,us-east-1,AWS-AWSManagedRulesCommonRuleSet,Managed,Block
-ACL-Manole-Prod,www.manole.com.br,CloudFront,us-east-1,AWS-AWSManagedRulesSQLiRuleSet,Managed,Count
-ACL-Manole-Prod,www.manole.com.br,CloudFront,us-east-1,RateLimitRule,Rate-based,Block
-ACL-Manole-Loja,loja.manole.com.br,ALB,sa-east-1,AWS-AWSManagedRulesKnownBadInputsRuleSet,Managed,Block
-ACL-Manole-Loja,loja.manole.com.br,ALB,sa-east-1,AWS-AWSManagedRulesBotControlRuleSet,Managed,Count
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),countryblock,Custom,Block
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),AWS-AWSManagedRulesPHPRuleSet,Managed,Block
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),AWS-AWSManagedRulesPHPRuleSet/PHPHighRiskMethodsVariables_BODY,Managed (excluded),Count
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),AWS-AWSManagedRulesPHPRuleSet/PHPHighRiskMethodsVariables_QUERYARGUMENTS,Managed (excluded),Count
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),AWS-AWSManagedRulesSQLiRuleSet,Managed,Block
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),AWS-AWSManagedRulesLinuxRuleSet,Managed,Block
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),AWS-AWSManagedRulesLinuxRuleSet/LFI_COOKIE,Managed (excluded),Count
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),AWS-AWSManagedRulesLinuxRuleSet/LFI_QUERYSTRING,Managed (excluded),Count
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),AWS-AWSManagedRulesLinuxRuleSet/LFI_URIPATH,Managed (excluded),Count
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),liberar-html-preview,Custom,Allow
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),AWS-AWSManagedRulesCommonRuleSet,Managed,Block
+WEBACL-ALB,albmanole,Application Load Balancer,US East (N. Virginia),AWS-AWSManagedRulesBotControlRuleSet,Managed,Block
